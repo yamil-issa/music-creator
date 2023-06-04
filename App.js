@@ -1,27 +1,30 @@
-import {NavigationContainer} from '@react-navigation/native';
-import { StyleSheet, Text, View } from 'react-native';
-import { HomeScreen } from './screens/HomeScreen';
-import { RecordScreen } from './screens/RecordScreen';
-import { RaveScreen } from './screens/RaveScreen';
+import { NavigationContainer } from '@react-navigation/native';
+import { StyleSheet } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-
+import { Provider } from 'react-redux';
+import store from './store';
+import HomeScreen from './screens/HomeScreen';
+import RecordScreen from './screens/RecordScreen';
+import RaveScreen from './screens/RaveScreen';
 
 const Tab = createMaterialTopTabNavigator();
+
 export default function App() {
   return (
-  <NavigationContainer styles={styles.navigationContainer}>
-    <Tab.Navigator>
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Record" component={RecordScreen} />
-      <Tab.Screen name="Rave" component={RaveScreen} />
-    </Tab.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer style={styles.navigationContainer}>
+        <Tab.Navigator>
+          <Tab.Screen name="Home" component={HomeScreen} />
+          <Tab.Screen name="Record" component={RecordScreen} />
+          <Tab.Screen name="Rave" component={RaveScreen} />
+        </Tab.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }
 
 const styles = StyleSheet.create({
-  
   navigationContainer: {
     marginTop: 4,
-  }
+  },
 });

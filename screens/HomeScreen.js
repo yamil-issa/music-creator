@@ -2,15 +2,23 @@ import React from 'react'
 import { connect } from 'react-redux';
 import { View, Text, TextInput, Button, StyleSheet, ToastAndroid, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
+import { setServerInfo } from '../redux/actions';
 
-export function HomeScreen({ navigation }) {
+const mapStateToProps = (state) => ({
+  serverInfo: state.serverInfo,
+});
+
+const mapDispatchToProps = {
+  setServerInfo,
+};
+
+export function HomeScreen({ serverInfo, setServerInfo }) {
   const [serverAddress, setServerAddress] = useState('');
   const [port, setPort] = useState('');
   const [connectionStatus, setConnectionStatus] = useState('');
 
   const handleTestConnection = () => {
-    // Send a test request to the server
-    // Replace the placeholder URL with your actual server endpoint
+    
     const testUrl = `http://${serverAddress}:${port}`;
 
     fetch(testUrl)
@@ -18,13 +26,15 @@ export function HomeScreen({ navigation }) {
         if (response.ok) {
           setConnectionStatus('Connection successful');
           showToast('Connection successful');
+          // Dispatch action to store server address and port
+          setServerInfo({ address: serverAddress, port: port });
+
         } else {
           setConnectionStatus('Connection failed');
           showToast('Connection failed');
         }
       })
       .catch(error => {
-        console.error('Error testing connection:', error);
         setConnectionStatus('Connection failed');
         showToast('Connection failed');
       });
@@ -34,10 +44,8 @@ export function HomeScreen({ navigation }) {
     ToastAndroid.show(message, ToastAndroid.SHORT);
   };
 
-  const handlerecord = () => {
-    navigation.navigate('Record'); // Navigate to the "Record" screen
-  }
-
+  
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Connect to Server</Text>
@@ -94,3 +102,5 @@ const styles = StyleSheet.create({
     display: 'flex',
   }
 });
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);

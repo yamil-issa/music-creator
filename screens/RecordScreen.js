@@ -3,11 +3,20 @@ import React, { useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
+import { addRecording } from '../redux/actions';
+import { useDispatch } from 'react-redux';
+import { connect } from 'react-redux';
+import { setRecordedFiles } from '../redux/actions';
+
+
+
 
 export const RecordScreen = () => {
   const [recording, setRecording] = useState();
   const [recordings, setRecordings] = useState([]);
   const [message, setMessage] = useState('');
+  const dispatch = useDispatch();
+
 
   async function startRecording() {
     try {
@@ -48,6 +57,10 @@ export const RecordScreen = () => {
       };
   
       setRecordings((prevRecordings) => [...prevRecordings, newRecording]);
+     
+
+    // Dispatch the setRecordedFiles action to store the recorded files
+    dispatch(setRecordedFiles([...recordings, newRecording]));
     } catch (error) {
       console.error('Failed to stop recording', error);
     }
@@ -136,3 +149,6 @@ const styles = StyleSheet.create({
     margin: 16,
   },
 });
+
+
+export default connect()(RecordScreen);
