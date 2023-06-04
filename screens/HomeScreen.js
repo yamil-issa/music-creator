@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux';
 import { View, Text, TextInput, Button, StyleSheet, ToastAndroid, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { setServerInfo } from '../redux/actions';
 
 const mapStateToProps = (state) => ({
@@ -12,10 +12,27 @@ const mapDispatchToProps = {
   setServerInfo,
 };
 
-export function HomeScreen({ serverInfo, setServerInfo }) {
+export function HomeScreen({ setServerInfo }) {
   const [serverAddress, setServerAddress] = useState('');
   const [port, setPort] = useState('');
+  const [models, setModels] = useState();
   const [connectionStatus, setConnectionStatus] = useState('');
+
+  const getModels = async () => {
+    let data = null;
+    try {
+      const response = await fetch(`http://${serverAddress}:${port}/getmodels`);
+      if (response.ok) {
+        data = await response.json();
+       
+      } else {
+        console.log('La requête a échoué');
+      }
+    } catch (error) {
+      console.error('Une erreur s\'est produite', error);
+    }
+    return data;
+  };
 
   const handleTestConnection = () => {
     
@@ -26,9 +43,15 @@ export function HomeScreen({ serverInfo, setServerInfo }) {
         if (response.ok) {
           setConnectionStatus('Connection successful');
           showToast('Connection successful');
+          
+         
+              setModels(getModels().models);
+            
+         
           // Dispatch action to store server address and port
-          setServerInfo({ address: serverAddress, port: port });
-
+          setServerInfo({ address: serverAddress, port: port, models: models });
+          //console.log(models);
+   
         } else {
           setConnectionStatus('Connection failed');
           showToast('Connection failed');

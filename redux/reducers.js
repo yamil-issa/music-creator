@@ -5,7 +5,6 @@ const initialState = {
   serverInfo: {
     address: '',
     port: '',
-    recordedFiles: [],
   },
   // ... other initial state properties ...
 };

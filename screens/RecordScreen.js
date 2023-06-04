@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
-import { addRecording } from '../redux/actions';
 import { useDispatch } from 'react-redux';
 import { connect } from 'react-redux';
 import { setRecordedFiles } from '../redux/actions';
