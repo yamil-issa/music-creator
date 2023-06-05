@@ -63,7 +63,7 @@ const RaveScreen = ({ recordedFiles, serverInfo }) => {
     }
   };
 
-
+  
   const handleFileDownload = async (file) => {
 
     try {
