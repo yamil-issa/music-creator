@@ -72,9 +72,7 @@ export const RecordScreen = () => {
 
     try {
       await FileSystem.deleteAsync(deletedRecording.file);
-      setRecordings((prevRecordings) =>
-        prevRecordings.filter((_, i) => i !== index)
-      );
+      dispatch(setRecordedFiles(recordedFiles.filter((_, i) => i !== index)));
     } catch (error) {
       console.error('Failed to delete recording', error);
     }
@@ -139,6 +137,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 10
   },
   fill: {
     flex: 1,

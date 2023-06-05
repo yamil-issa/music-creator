@@ -13,7 +13,7 @@ export default function App() {
   return (
     <Provider store={store}>
       <NavigationContainer style={styles.navigationContainer}>
-        <Tab.Navigator>
+        <Tab.Navigator style={styles.tabNavigatorContainer}>
           <Tab.Screen name="Home" component={HomeScreen} />
           <Tab.Screen name="Record" component={RecordScreen} />
           <Tab.Screen name="Rave" component={RaveScreen} />
@@ -25,6 +25,9 @@ export default function App() {
 
 const styles = StyleSheet.create({
   navigationContainer: {
-    marginTop: 4,
+    
   },
+  tabNavigatorContainer: {
+    marginTop: 20,
+  }
 });

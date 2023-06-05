@@ -1,8 +1,8 @@
 import { connect } from 'react-redux';
-import { View, Text, FlatList, Button, StyleSheet, TouchableOpacity, ToastAndroid } from 'react-native';
+import { View, Text, FlatList, Button, StyleSheet, TouchableOpacity, ToastAndroid, ActivityIndicator } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as FileSystem from 'expo-file-system';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Audio } from 'expo-av';
 
 
@@ -13,6 +13,11 @@ const RaveScreen = ({ recordedFiles, serverInfo }) => {
   const models = serverInfo.models;
   const [selectedModel, setSelectedModel] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [sound, setSound] = useState(null);
+  const soundRef = useRef(null);
+  const [isFileDownloaded, setIsFileDownloaded] = useState(false);
+
 
 
 
@@ -42,6 +47,7 @@ const RaveScreen = ({ recordedFiles, serverInfo }) => {
 
   const handleFileUpload = async (file) => {
     try {
+      setLoading(true);
       const fileUri = file.info.uri;
       const response = await FileSystem.uploadAsync(`http://${address}:${port}/upload`, fileUri, {
         fieldName: 'file',
@@ -52,6 +58,8 @@ const RaveScreen = ({ recordedFiles, serverInfo }) => {
      showToast(response.body);
     } catch (error) {
       console.error('Failed to upload file', error);
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -67,12 +75,40 @@ const RaveScreen = ({ recordedFiles, serverInfo }) => {
     if (!directoryInfo.exists) {
       await FileSystem.makeDirectoryAsync(directory);
     }
+    const serverAddress = `http://${address}:${port}/download`;
 
       // Download file
-      const { uri } = await FileSystem.downloadAsync(`http://${address}:${port}/download/`, directory + "/hey.wav");
+      const { uri } = await FileSystem.downloadAsync(serverAddress, directory + "/hey.wav");
+      showToast('File downloaded');
+      setSelectedFile(uri);
+      setIsFileDownloaded(true);
+
+      const { sound } = await Audio.Sound.createAsync({ uri });
+      setSound(sound);
+      soundRef.current = sound;
   
     } catch (error) {
       console.error('Failed to download file', error);
+    }
+  };
+  
+  const handlePlaySound = async () => {
+    try {
+      if (soundRef.current) {
+        await soundRef.current.playAsync();
+      }
+    } catch (error) {
+      console.error('Failed to play sound', error);
+    }
+  };
+
+  const handleStopSound = async () => {
+    try {
+      if (soundRef.current) {
+        await soundRef.current.stopAsync();
+      }
+    } catch (error) {
+      console.error('Failed to stop sound', error);
     }
   };
 
@@ -108,14 +144,34 @@ const RaveScreen = ({ recordedFiles, serverInfo }) => {
         ))}
       </Picker>
     </View><View style={styles.container}>
+    
     <FlatList
           data={recordedFiles}
           renderItem={renderItem}
           keyExtractor={(item) => item.info.uri}
         />
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <Text></Text>
+        )}
+         {isFileDownloaded && (
+        <View style={styles.buttonContainer}>
+          <Button
+            style={styles.playStopButton}
+            onPress={handleStopSound}
+            title="Stop"
+          />
+          <Button
+            style={styles.playStopButton}
+            onPress={handlePlaySound}
+            title="Play"
+          />
+        </View>
+      )}
       </View>
+     
       <Button
-          style={styles.button}
           onPress={() => handleFileDownload()}
           title="Download" />
 
@@ -149,6 +205,17 @@ const styles = StyleSheet.create({
   button: {
     marginRight: 16,
   },
+  buttonContainer: {
+    marginBottom: 150,
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  playStopButton: {
+
+  }
 });
 
 const mapStateToProps = (state) => {
