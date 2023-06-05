@@ -5,6 +5,7 @@ const initialState = {
   serverInfo: {
     address: '',
     port: '',
+    models: []
   },
   // ... other initial state properties ...
 };

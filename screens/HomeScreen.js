@@ -24,6 +24,8 @@ export function HomeScreen({ setServerInfo }) {
       const response = await fetch(`http://${serverAddress}:${port}/getmodels`);
       if (response.ok) {
         data = await response.json();
+        setModels(data.models);
+        setServerInfo({ address: serverAddress, port: port, models: data.models });
        
       } else {
         console.log('La requête a échoué');
@@ -43,14 +45,7 @@ export function HomeScreen({ setServerInfo }) {
         if (response.ok) {
           setConnectionStatus('Connection successful');
           showToast('Connection successful');
-          
-         
-              setModels(getModels().models);
-            
-         
-          // Dispatch action to store server address and port
-          setServerInfo({ address: serverAddress, port: port, models: models });
-          //console.log(models);
+          getModels();
    
         } else {
           setConnectionStatus('Connection failed');

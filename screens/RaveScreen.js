@@ -3,6 +3,7 @@ import { View, Text, FlatList, Button, StyleSheet, TouchableOpacity, ToastAndroi
 import { Picker } from '@react-native-picker/picker';
 import * as FileSystem from 'expo-file-system';
 import { useEffect, useState } from 'react';
+import { Audio } from 'expo-av';
 
 
 
@@ -57,15 +58,23 @@ const RaveScreen = ({ recordedFiles, serverInfo }) => {
 
   const handleFileDownload = async (file) => {
 
+    try {
+      // Create a directory in the app document directory
+    let directory = FileSystem.documentDirectory + "my_directory";
 
-    // Create a directory in the app document directory
-    let directory = FileSystem.documentDirectory + "my_directory"
-    await Filesystem.makeDirectoryAsync(directory);
-    
-    // Download file
-    const { uri } = await FileSystem.downloadAsync(`http://${address}:${port}/download/` + "", directory + "/hey.wav")
-    
+
+    const directoryInfo = await FileSystem.getInfoAsync(directory);
+    if (!directoryInfo.exists) {
+      await FileSystem.makeDirectoryAsync(directory);
     }
+
+      // Download file
+      const { uri } = await FileSystem.downloadAsync(`http://${address}:${port}/download/`, directory + "/hey.wav");
+  
+    } catch (error) {
+      console.error('Failed to download file', error);
+    }
+  };
 
     const renderItem = ({ item }) => {
       const handleFileSelection = () => {
